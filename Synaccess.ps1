@@ -19,7 +19,7 @@ do {
     $Username = Read-Host -Prompt Username
     $Password = Read-Host -Prompt Password -AsSecureString
     [PSCredential]$Credentials = New-Object System.Management.Automation.PSCredential ($Username, $Password)
-    Invoke-WebRequest -Uri ("http://" + "$IP") -Credential $Credentials -AllowUnencryptedAuthentication -SessionVariable Session -ErrorAction SilentlyContinue -ErrorVariable ConnectError | Out-Null
+    Invoke-WebRequest -Uri ("http://" + "$IP") -Credential $Credentials -Authentication Basic -AllowUnencryptedAuthentication -SessionVariable Session -ErrorAction SilentlyContinue -ErrorVariable ConnectError | Out-Null
     if ($ConnectError -ne 0) {
         Write-Host "Bad request or creds"
     }
@@ -48,11 +48,11 @@ function PortSelect {
     Write-Host "
 Ports:
     
-1. Primary
-2. Secondary
-3. Starbox
-4. Sonicwall
-5. Switch
+1. Port 1
+2. Port 2
+3. Port 3
+4. Port 4
+5. Port 5
 6. Go back
 7. Exit script
 "
@@ -74,27 +74,27 @@ function Operations {
             switch ($global:PortSelection) {
                 1 {
                     Write-Host ""
-                    Write-Warning "Rebooting Primary"
+                    Write-Warning "Rebooting Port 1"
                     Invoke-WebRequest ("http://" + $IP + "/cmd.cgi?rb=0") -WebSession $Session | Out-Null
                 }
                 2 {
                     Write-Host ""
-                    Write-Warning "Rebooting Secondary"
+                    Write-Warning "Rebooting Port 2"
                     Invoke-WebRequest ("http://" + $IP + "/cmd.cgi?rb=1") -WebSession $Session | Out-Null
                 }
                 3 {
                     Write-Host ""
-                    Write-Warning "Rebooting Starbox"
+                    Write-Warning "Rebooting Port 3"
                     Invoke-WebRequest ("http://" + $IP + "/cmd.cgi?rb=2") -WebSession $Session | Out-Null
                 }
                 4 {
                     Write-Host ""
-                    Write-Warning "Rebooting Sonicwall"
+                    Write-Warning "Rebooting Port 4"
                     Invoke-WebRequest ("http://" + $IP + "/cmd.cgi?rb=3") -WebSession $Session | Out-Null
                 }
                 5 {
                     Write-Host ""
-                    Write-Warning "Rebooting Switch"
+                    Write-Warning "Rebooting Port 5"
                     Invoke-WebRequest ("http://" + $IP + "/cmd.cgi?rb=4") -WebSession $Session | Out-Null
                 }
                 6 {
@@ -111,27 +111,27 @@ function Operations {
             switch ($global:PortSelection) {
                 1 {
                     Write-Host ""
-                    Write-Warning "Toggling Primary On/Off"
+                    Write-Warning "Toggling Port 1 On/Off"
                     Invoke-WebRequest ("http://" + $IP + "/cmd.cgi?rly=0") -WebSession $Session | Out-Null
                 }
                 2 {
                     Write-Host ""
-                    Write-Warning "Toggling Secondary On/Off"
+                    Write-Warning "Toggling Port 2 On/Off"
                     Invoke-WebRequest ("http://" + $IP + "/cmd.cgi?rly=1") -WebSession $Session | Out-Null
                 }
                 3 {
                     Write-Host ""
-                    Write-Warning "Toggling Starbox On/Off"
+                    Write-Warning "Toggling Port 3 On/Off"
                     Invoke-WebRequest ("http://" + $IP + "/cmd.cgi?rly=2") -WebSession $Session | Out-Null
                 }
                 4 {
                     Write-Host ""
-                    Write-Warning "Toggling Sonicwall On/Off"
+                    Write-Warning "Toggling Port 4 On/Off"
                     Invoke-WebRequest ("http://" + $IP + "/cmd.cgi?rly=3") -WebSession $Session | Out-Null
                 }
                 5 {
                     Write-Host ""
-                    Write-Warning "Toggling Switch On/Off"
+                    Write-Warning "Toggling Port 5 On/Off"
                     Invoke-WebRequest ("http://" + $IP + "/cmd.cgi?rly=4") -WebSession $Session | Out-Null
                 }
                 6 {
