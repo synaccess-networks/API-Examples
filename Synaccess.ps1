@@ -2,26 +2,30 @@
 #Connect to synaccess and reboot/shutdown ports
 Clear-Host
 Write-Warning "Toggle does not differentiate between 'On' or 'Off'. If port is 'Off' using the reboot function will turn the port 'On' and then back 'Off'."
-do {
-    Write-Host ""
-    $IP = Read-Host -Prompt "Enter IP of SynAccess to connect to"
-    $AliveTest = Test-Connection -Ping $IP -IPv4 -Count 1
-    if (!($AliveTest.Status -eq "Success")) {
+function SynIP {
+    do {
         Write-Host ""
-        Write-Warning "Invalid host or does not appear to be alive"
+        $global:IP = Read-Host -Prompt "Enter IP of SynAccess to connect to"
+        $AliveTest = Test-Connection -Ping $Global:IP -IPv4 -Count 1
+        if (!($AliveTest.Status -eq "Success")) {
+            Write-Host ""
+            Write-Warning "Invalid host or does not appear to be alive"
+        }
     }
+    until ($AliveTest.Status -eq "Success")
 }
-until ($AliveTest.Status -eq "Success")
-
+SynIP
 do {
     Write-Host ""
     $ConnectError = $null
     $Username = Read-Host -Prompt Username
     $Password = Read-Host -Prompt Password -AsSecureString
     [PSCredential]$Credentials = New-Object System.Management.Automation.PSCredential ($Username, $Password)
-    Invoke-WebRequest -Uri ("http://" + "$IP") -Credential $Credentials -Authentication Basic -AllowUnencryptedAuthentication -SessionVariable Session -ErrorAction SilentlyContinue -ErrorVariable ConnectError | Out-Null
-    if ($ConnectError -ne 0) {
-        Write-Host "Bad request or creds"
+    $SynTest = Invoke-WebRequest -Uri ("http://$Global:IP") -Credential $Credentials -Authentication Basic -AllowUnencryptedAuthentication -SkipCertificateCheck -SessionVariable Session -ErrorAction SilentlyContinue -ErrorVariable ConnectError
+    if ($SynTest.Content -notmatch "<title>Synaccess netBooter</title>" -or $Null -ne $ConnectError.length) {
+        Clear-Host
+        Write-Host "$Global:IP is not a Synaccess or creds are not proper"
+        SynIP
     }
 }
 until ($ConnectError.message.length -eq 0)
@@ -75,27 +79,27 @@ function Operations {
                 1 {
                     Write-Host ""
                     Write-Warning "Rebooting Port 1"
-                    Invoke-WebRequest ("http://" + $IP + "/cmd.cgi?rb=0") -WebSession $Session | Out-Null
+                    Invoke-WebRequest ("http://" + $Global:IP + "/cmd.cgi?rb=0") -WebSession $Session | Out-Null
                 }
                 2 {
                     Write-Host ""
                     Write-Warning "Rebooting Port 2"
-                    Invoke-WebRequest ("http://" + $IP + "/cmd.cgi?rb=1") -WebSession $Session | Out-Null
+                    Invoke-WebRequest ("http://" + $Global:IP + "/cmd.cgi?rb=1") -WebSession $Session | Out-Null
                 }
                 3 {
                     Write-Host ""
-                    Write-Warning "Rebooting Port 3"
-                    Invoke-WebRequest ("http://" + $IP + "/cmd.cgi?rb=2") -WebSession $Session | Out-Null
+                    Write-Warning "Rebooting Port 3x"
+                    Invoke-WebRequest ("http://" + $Global:IP + "/cmd.cgi?rb=2") -WebSession $Session | Out-Null
                 }
                 4 {
                     Write-Host ""
                     Write-Warning "Rebooting Port 4"
-                    Invoke-WebRequest ("http://" + $IP + "/cmd.cgi?rb=3") -WebSession $Session | Out-Null
+                    Invoke-WebRequest ("http://" + $Global:IP + "/cmd.cgi?rb=3") -WebSession $Session | Out-Null
                 }
                 5 {
                     Write-Host ""
                     Write-Warning "Rebooting Port 5"
-                    Invoke-WebRequest ("http://" + $IP + "/cmd.cgi?rb=4") -WebSession $Session | Out-Null
+                    Invoke-WebRequest ("http://" + $Global:IP + "/cmd.cgi?rb=4") -WebSession $Session | Out-Null
                 }
                 6 {
                     Operations
@@ -112,27 +116,27 @@ function Operations {
                 1 {
                     Write-Host ""
                     Write-Warning "Toggling Port 1 On/Off"
-                    Invoke-WebRequest ("http://" + $IP + "/cmd.cgi?rly=0") -WebSession $Session | Out-Null
+                    Invoke-WebRequest ("http://" + $Global:IP + "/cmd.cgi?rly=0") -WebSession $Session | Out-Null
                 }
                 2 {
                     Write-Host ""
                     Write-Warning "Toggling Port 2 On/Off"
-                    Invoke-WebRequest ("http://" + $IP + "/cmd.cgi?rly=1") -WebSession $Session | Out-Null
+                    Invoke-WebRequest ("http://" + $Global:IP + "/cmd.cgi?rly=1") -WebSession $Session | Out-Null
                 }
                 3 {
                     Write-Host ""
                     Write-Warning "Toggling Port 3 On/Off"
-                    Invoke-WebRequest ("http://" + $IP + "/cmd.cgi?rly=2") -WebSession $Session | Out-Null
+                    Invoke-WebRequest ("http://" + $Global:IP + "/cmd.cgi?rly=2") -WebSession $Session | Out-Null
                 }
                 4 {
                     Write-Host ""
                     Write-Warning "Toggling Port 4 On/Off"
-                    Invoke-WebRequest ("http://" + $IP + "/cmd.cgi?rly=3") -WebSession $Session | Out-Null
+                    Invoke-WebRequest ("http://" + $Global:IP + "/cmd.cgi?rly=3") -WebSession $Session | Out-Null
                 }
                 5 {
                     Write-Host ""
                     Write-Warning "Toggling Port 5 On/Off"
-                    Invoke-WebRequest ("http://" + $IP + "/cmd.cgi?rly=4") -WebSession $Session | Out-Null
+                    Invoke-WebRequest ("http://" + $Global:IP + "/cmd.cgi?rly=4") -WebSession $Session | Out-Null
                 }
                 6 {
                     Operations
